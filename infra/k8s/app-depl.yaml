@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app
+  template:
+    metadata:
+      labels:
+        app: app
+    spec:
+      containers:
+        - name: app
+          image: rshbhchauhan/app
+          env:
+            - name: JWT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret
+                  key: JWT_KEY
+            - name: MONGO_URI
+              value: mongodb://app-mongo-srv:27017/app
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-srv
+spec:
+  selector:
+    app: app
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
